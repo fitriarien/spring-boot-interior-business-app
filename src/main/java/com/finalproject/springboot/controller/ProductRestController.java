@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,6 +90,12 @@ public class ProductRestController {
 
         if (currRole.equalsIgnoreCase("admin")) {
             if (currStatus == 1) {
+                if (productDTO.getProduct_name() == "") {
+                    logger.error("Unable to create product. Product name cannot be null.");
+                    return new ResponseEntity<>(new CustomErrorType("Unable to create product. Product name cannot be null."),
+                            HttpStatus.FORBIDDEN);
+                }
+
                 logger.info("Creating Product : {}", productDTO);
                 ProductDAO currProduct = new ProductDAO();
                 currProduct.setProduct_name(productDTO.getProduct_name());

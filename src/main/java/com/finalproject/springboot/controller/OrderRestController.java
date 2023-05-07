@@ -5,14 +5,16 @@ import com.finalproject.springboot.model.dao.OrderDetDAO;
 import com.finalproject.springboot.model.dao.ProductDAO;
 import com.finalproject.springboot.model.dao.UserDAO;
 import com.finalproject.springboot.model.dto.OrderDTO;
+import com.finalproject.springboot.repository.OrderPagesRepo;
 import com.finalproject.springboot.repository.OrderRepo;
 import com.finalproject.springboot.repository.ProductRepo;
 import com.finalproject.springboot.repository.UserRepo;
 import com.finalproject.springboot.util.CustomErrorType;
-import org.aspectj.weaver.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin("*")
@@ -33,6 +34,8 @@ public class OrderRestController {
     UserRepo userRepo;
     @Autowired
     ProductRepo productRepo;
+    @Autowired
+    OrderPagesRepo orderPagesRepo;
 
     // -------------------------- View User Orders -----------------------------------------
     @RequestMapping(value = "/order/{user_id}", method = RequestMethod.GET, produces="application/json")
@@ -47,7 +50,7 @@ public class OrderRestController {
                     HttpStatus.FORBIDDEN);
         }
 
-        // check the role
+        // check the status
         logger.info("Checking the status with user_id : {} before viewing order", user_id);
         UserDAO currUser = userRepo.findById(userIdLong).orElse(null);
         int currStatus = currUser.getStatus();
@@ -81,7 +84,7 @@ public class OrderRestController {
                     HttpStatus.FORBIDDEN);
         }
 
-        // check the role
+        // check the status
         logger.info("Checking the status with user_id : {} before viewing order", user_id);
         UserDAO currUser = userRepo.findById(userIdLong).orElse(null);
         int currStatus = currUser.getStatus();
@@ -227,11 +230,21 @@ public class OrderRestController {
     // ------------------- Retrieve all orders -------------------------------------------
     @RequestMapping(value = "/order/", method = RequestMethod.GET, produces="application/json")
     public ResponseEntity<List<OrderDAO>> getAllOrders() throws SQLException, ClassNotFoundException {
+        logger.info("Step 1");
         List<OrderDAO> orders = orderRepo.findAll(); //direct jpa method
         if (orders.isEmpty()) {
+            logger.error("Step error");
             return new ResponseEntity<>(orders, HttpStatus.NOT_FOUND);
         }
-
+        logger.info("Step 2");
         return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+    // ------------------- Retrieve all orders with pagination -------------------------------------------
+    @GetMapping(value = "/orders")
+    public Page<OrderDAO> findAll(@RequestParam int page, @RequestParam int size) {
+        logger.info("Request orders page : {}", page);
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return orderPagesRepo.findAll(pageRequest);
     }
 }

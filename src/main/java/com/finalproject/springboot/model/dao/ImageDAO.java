@@ -71,4 +71,5 @@ public class ImageDAO {
     public void setUserDAO(UserDAO userDAO) {
         this.userDAO = userDAO;
     }
+    
 }
