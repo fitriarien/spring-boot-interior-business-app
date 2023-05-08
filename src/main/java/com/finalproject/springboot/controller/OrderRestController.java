@@ -182,6 +182,11 @@ public class OrderRestController {
             if (currStatus==1) {
                 // find order by id
                 OrderDAO currOrder = orderRepo.findById(orderIdLong).orElse(null);
+                if (currOrder == null) {
+                    logger.error("Order with id {} not found.", order_id);
+                    return new ResponseEntity<>(new CustomErrorType("Order with id " + order_id  + " not found"),
+                            HttpStatus.NOT_FOUND);
+                }
 
                 double orderAmount = currOrder.getOrder_amount();
 

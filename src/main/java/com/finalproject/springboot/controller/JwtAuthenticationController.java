@@ -53,14 +53,14 @@ public class JwtAuthenticationController {
 		final UserDAO user = userRepo.findByUsername(authenticationRequest.getUsername());
 		if (user == null) {
 			logger.error("Unable to login. Username of {} is not found.", authenticationRequest.getUsername());
-			return new ResponseEntity<>(new CustomErrorType("Login Failed: We could not find your account."),
+			return new ResponseEntity<>(new CustomErrorType("Login Failed: Username & password doesn't match."),
 					HttpStatus.NOT_FOUND);
 		}
 		// check password
 		if (!(bcryptEncoder.matches(authenticationRequest.getPassword(), user.getPassword()))) {
 			logger.error("Unable to login. Password is wrong.");
-			return new ResponseEntity<>(new CustomErrorType("Login Failed: Wrong Password. " +
-					"Please re-enter the password."), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<>(new CustomErrorType("Login Failed: Username & password doesn't match."),
+					HttpStatus.FORBIDDEN);
 		}
 		// check user status
 		if (user.getStatus() != 1) {

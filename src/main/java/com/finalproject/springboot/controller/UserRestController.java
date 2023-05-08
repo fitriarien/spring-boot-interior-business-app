@@ -39,7 +39,7 @@ public class UserRestController {
 
         if (userDAO == null) {
             logger.error("User with id {} not found.", user_id);
-            return new ResponseEntity<>(new CustomErrorType("User with id " + user_id  + " is not found"),
+            return new ResponseEntity<>(new CustomErrorType("User is not found"),
                     HttpStatus.NOT_FOUND);
         }
 
@@ -62,8 +62,8 @@ public class UserRestController {
 
         if (currUser == null) {
             logger.error("Unable to update. User with id {} not found.", user_id);
-            return new ResponseEntity<>(new CustomErrorType("Unable to update. User with id " + user_id
-                    + " is not found."), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new CustomErrorType("Unable to update. User is not found."),
+                    HttpStatus.NOT_FOUND);
         }
 
         // map data to DAO
